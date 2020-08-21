@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Weathers by Claret - Wejapa Internship Task 4</title>
+    <link rel="stylesheet" href="./public/css/style.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="//fonts.googleapis.com/css?family=Merriweather"
+    />
+  </head>
+
+  <body>
+    <div id="title">Weathers by Claret</div>
+    <div id="map"></div>
+    <div id="weather">
+      <input
+        id="search"
+        list="locations"
+        placeholder="Find Location"
+        size="50"
+      />
+      <div id="locations" class="disappear"></div>
+      <div id="details" class="disappear">
+        <div style="margin: 10px 0;">
+          Weather Details for
+          <span id="weather-location" style="font-weight: bold;">Abuja</span>
+        </div>
+        Description: <span id="weather-description">light rain</span><br />
+        Tempreature: <span id="weather-tempreature">293.91</span><br />
+        Pressure: <span id="weather-pressure">1010</span><br />
+        Humidity: <span id="weather-humidity">100</span><br />
+        Wind speed: <span id="weather-wind-speed">1010</span>
+      </div>
+    </div>
+  </body>
+</html>
+<script
+  async
+  defer
+  src="https://maps.googleapis.com/maps/api/js?key={{MAPS_API_KEY}}&callback=initialize"
+></script>
+<script>
+  let map;
+  function initialize() {
+    map = new google.maps.Map(document.getElementById("map"), {
+      center: { lat: 5.49424, lng: 7.03339 },
+      zoom: 8,
+    });
+
+    let marker = new google.maps.Marker({
+      position: new google.maps.LatLng(5.49424, 7.03339),
+      map: map,
+    });
+
+    google.maps.event.addListener(map, "click", function (event) {
+      document.querySelector("#search").value = "";
+      let position = new google.maps.LatLng(
+        event.latLng.lat(),
+        event.latLng.lng()
+      );
+      fetch(
+        `https://api.openweathermap.org/data/2.5/weather?lat=${event.latLng.lat()}&lon=${event.latLng.lng()}&appid={{WEATHER_API_KEY}}`
+      ).then((res) => {
+        res.json().then((data) => {
+          document.querySelector("#weather-location").innerHTML = data.name;
+          document.querySelector("#weather-description").innerHTML =
+            data.weather[0].description;
+          document.querySelector("#weather-tempreature").innerHTML =
+            data.main.temp;
+          document.querySelector("#weather-pressure").innerHTML =
+            data.main.pressure;
+          document.querySelector("#weather-humidity").innerHTML =
+            data.main.humidity;
+          document.querySelector("#weather-wind-speed").innerHTML =
+            data.wind.speed;
+          document.querySelector("#details").classList.remove("disappear");
+          marker.setPosition(position);
+          map.setCenter(position);
+        });
+      });
+    });
+
+    document.getElementById("search").addEventListener("keyup", (e) => {
+      search(e.target.value);
+    });
+
+    document.body.onclick = () => {
+      document.getElementById("locations").classList.add("disappear");
+    };
+
+    document.getElementById("search").oninput = () => {
+      document.getElementById("locations").classList.remove("disappear");
+    };
+
+    function search(q) {
+      link = `https://eu1.locationiq.com/v1/search.php?key={{GEO_CODING_API_KEY}}&q=${q}&format=json`;
+      fetch(link).then((res) => {
+        res.json().then((data) => {
+          str = "";
+          if (data.error) {
+            return;
+          }
+          data.forEach((element) => {
+            str += `<li class="sugestions"  data-lng="${element.lon}" data-lat="${element.lat}"><span data-lng="${element.lon}" data-lat="${element.lat}">${element.display_name}</span></li>`;
+          });
+          document.getElementById("locations").innerHTML = str;
+          document.querySelectorAll(".sugestions").forEach((sugestion) => {
+            sugestion.onclick = (e) => {
+              let position = new google.maps.LatLng(
+                e.target.getAttribute("data-lat"),
+                e.target.getAttribute("data-lng")
+              );
+              fetch(
+                `https://api.openweathermap.org/data/2.5/weather?lat=${e.target.getAttribute(
+                  "data-lat"
+                )}&lon=${e.target.getAttribute(
+                  "data-lng"
+                )}&appid={{WEATHER_API_KEY}}`
+              ).then((res) => {
+                res.json().then((data) => {
+                  document.querySelector("#weather-location").innerHTML =
+                    data.name;
+                  document.querySelector("#weather-description").innerHTML =
+                    data.weather[0].description;
+                  document.querySelector("#weather-tempreature").innerHTML =
+                    data.main.temp;
+                  document.querySelector("#weather-pressure").innerHTML =
+                    data.main.pressure;
+                  document.querySelector("#weather-humidity").innerHTML =
+                    data.main.humidity;
+                  document.querySelector("#weather-wind-speed").innerHTML =
+                    data.wind.speed;
+                  document
+                    .querySelector("#details")
+                    .classList.remove("disappear");
+                  marker.setPosition(position);
+                  map.setCenter(position);
+                });
+              });
+            };
+          });
+        });
+      });
+    }
+  }
+</script>
