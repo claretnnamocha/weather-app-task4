@@ -5,7 +5,7 @@ Link : https://weathers-by-claret.herokuapp.com/
 
 
 # Preview:
-![Preview](https://github.com/claretnnamocha/weather-app-task4/blob/master/ScreenPlay.gif?raw=true)  
+![Preview](https://github.com/claretnnamocha/weather-app-task4/blob/master/Screenplay.gif?raw=true)  
 #
 # Screenshot:
 ![Screenshot](https://github.com/claretnnamocha/weather-app-task4/blob/master/Screenshot.png?raw=true)
