@@ -65,16 +65,17 @@
       ).then((res) => {
         res.json().then((data) => {
           document.querySelector("#weather-location").innerHTML = data.name;
+          document.querySelector("#search").value = data.name;
           document.querySelector("#weather-description").innerHTML =
             data.weather[0].description;
           document.querySelector("#weather-tempreature").innerHTML =
-            data.main.temp;
+            (data.main.temp - 273.15).toFixed(2) + " °C";
           document.querySelector("#weather-pressure").innerHTML =
-            data.main.pressure;
+            data.main.pressure + " hPa";
           document.querySelector("#weather-humidity").innerHTML =
-            data.main.humidity;
+            data.main.humidity + "%";
           document.querySelector("#weather-wind-speed").innerHTML =
-            data.wind.speed;
+            data.wind.speed + " m/s";
           document.querySelector("#details").classList.remove("disappear");
           marker.setPosition(position);
           map.setCenter(position);
